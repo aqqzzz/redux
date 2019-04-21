@@ -17,6 +17,7 @@ export default function compose(...funcs) {
   if (funcs.length === 1) {
     return funcs[0]
   }
-
+  // funcs中前 n-1 个函数都只能接受一个输入参数，最后一个函数可以接受多个输入参数
+  // 常用于中间件的定义
   return funcs.reduce((a, b) => (...args) => a(b(...args)))
 }

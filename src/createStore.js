@@ -57,10 +57,11 @@ export default function createStore(reducer, preloadedState, enhancer) {
     throw new Error('Expected the reducer to be a function.')
   }
 
-  let currentReducer = reducer
-  let currentState = preloadedState
-  let currentListeners = []
-  let nextListeners = currentListeners
+  let currentReducer = reducer // 当前 store 中的 reducer
+  let currentState = preloadedState // 当前 store 中存储的状态
+  let currentListeners = [] // 当前 store 中放置的 监听函数
+  let nextListeners = currentListeners // 下一次dispatch 时的监听函数
+  // 注意，当我们新添加一个监听函数时，这个监听函数只会在下一次 dispatch 的时候生效
   let isDispatching = false // 当前是否处于一次dispatch过程中
 
   /**
@@ -238,7 +239,7 @@ export default function createStore(reducer, preloadedState, enhancer) {
    * You might need this if your app implements code splitting and you want to
    * load some of the reducers dynamically. You might also need this if you
    * implement a hot reloading mechanism for Redux.
-   * // 代码分割 或 动态加载reducer 或 redux 热加载机制 时 需要使用这个方法？？？？
+   * // 代码分割 或 动态加载reducer 或 redux 模块热替换机制 时 需要使用这个方法？？？？
    *
    * @param {Function} nextReducer The reducer for the store to use instead.
    * @returns {void}
