@@ -108,13 +108,19 @@ function assertReducerShape(reducers) {
  * undefined for any action. Instead, they should return their initial state
  * if the state passed to them was undefined, and the current state for any
  * unrecognized action.
+ * 参数 reducers 是一个 Object，类似 {
+ *  todos: function todo,
+ *  others: function others,
+ * }
  *
  * @returns {Function} A reducer function that invokes every reducer inside the
  * passed object, and builds a state object with the same shape.
+ * 返回值 是一个包装过的函数，接受 state 和 action 作为参数
  */
 export default function combineReducers(reducers) {
   const reducerKeys = Object.keys(reducers)
   const finalReducers = {}
+  // 对reducers中的各项做检查
   for (let i = 0; i < reducerKeys.length; i++) {
     const key = reducerKeys[i]
 
@@ -143,7 +149,10 @@ export default function combineReducers(reducers) {
   } catch (e) {
     shapeAssertionError = e
   }
-
+  // 返回值为一个函数，接受 state 和 action 两个参数
+  // state 为当前store 中的整体state对象
+  // action 为此次引起变动的对象
+  // 在createStore 中调用 dispatch({ type: Actions.INIT }) 初始化时传入的state为空对象
   return function combination(state = {}, action) {
     if (shapeAssertionError) {
       throw shapeAssertionError
@@ -161,18 +170,19 @@ export default function combineReducers(reducers) {
       }
     }
 
+    // hasChanged 标识当前action是否引起了state的变化，如果并没有变化的话则直接返回原state对象
     let hasChanged = false
     const nextState = {}
     for (let i = 0; i < finalReducerKeys.length; i++) {
       const key = finalReducerKeys[i]
-      const reducer = finalReducers[key]
-      const previousStateForKey = state[key]
-      const nextStateForKey = reducer(previousStateForKey, action)
+      const reducer = finalReducers[key] // reducer 为 当前 key 对应的function
+      const previousStateForKey = state[key] // state 为当前 key 对应的 对象【初始化时为 undefined】
+      const nextStateForKey = reducer(previousStateForKey, action) // 接收 对应reducer的state和action并返回修改之后的state 【初始化时使用了reducer中的initialState】
       if (typeof nextStateForKey === 'undefined') {
         const errorMessage = getUndefinedStateErrorMessage(key, action)
         throw new Error(errorMessage)
       }
-      nextState[key] = nextStateForKey
+      nextState[key] = nextStateForKey // 更新 当前 key 对应的 state 对象
       hasChanged = hasChanged || nextStateForKey !== previousStateForKey
     }
     return hasChanged ? nextState : state

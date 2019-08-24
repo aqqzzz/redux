@@ -27,10 +27,10 @@ if (
 }
 
 export {
-  createStore,
-  combineReducers,
-  bindActionCreators,
-  applyMiddleware,
-  compose,
+  createStore, // 核心入口，创建应用的store对象
+  combineReducers, // 合并reducer
+  bindActionCreators, // 生成 action
+  applyMiddleware, // 添加中间件
+  compose, // 工具方法 返回：(...args) => f(g(h(...args)))
   __DO_NOT_USE__ActionTypes
 }
